@@ -15,6 +15,9 @@
   $: {
     if (!item) {
       item = $queue[0];
+    } else if (item === $queue[0]) {	
+      queue.removeAt($queue.indexOf(item));	
+      item = $queue[0];
     }
 
     if (typeof item === "string") {

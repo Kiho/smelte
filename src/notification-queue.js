@@ -28,6 +28,11 @@ export default function notificationQueue() {
       store.update(u => {
         u.splice(get(store).indexOf(i), 1);
         return u;
-      })
+      }),
+    removeAt: i =>
+      store.update(u => {	  
+        u.splice(i, 1);	       
+        return u;
+      }) 
   };
 }
