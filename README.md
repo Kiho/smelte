@@ -1,11 +1,10 @@
 # Smelte
-
-[![Smelte logo](http://smeltejs.com/logo-192.png)](https://smeltejs.com/)
+[![Smelte logo](http://smeltejs.com/logo-192.png)](https://smeltejs.com/)  
 
 [![license](https://img.shields.io/npm/l/smelte.svg)](https://img.shields.io/npm/l/smelte.svg)
 [![downloads](https://img.shields.io/npm/dm/smelte.svg)](https://img.shields.io/npm/dm/smelte.svg)
 [![version](https://img.shields.io/npm/v/smelte.svg)](https://img.shields.io/npm/v/smelte.svg)
-[![Discord Chat](https://img.shields.io/discord/671589733356535818.svg)](https://discord.gg/)
+[![Discord Chat](https://img.shields.io/discord/671589733356535818.svg)](https://discord.gg/)  
 
 [Demo](http://smeltejs.com/)
 
@@ -14,15 +13,12 @@ It comes with many components and utility functions making it easy to build beau
 bundle size and performance at check all thanks to Svelte.
 
 ### Installation
-
 To get you started you need to add Smelte to your dependencies with your favorite package manager
-
 ```
-$ npm install smelte or yarn add smelte
+$ npm install smelte or yarn install smelte
 ```
 
 Then you need to add Smelte Rollup plugin (Webpack is on its way).
-
 ```js
 const smelte = require("smelte/rollup-plugin-smelte");
 
@@ -35,15 +31,6 @@ plugins = [
     whitelist: [], // Array of classnames whitelisted from purging
     whitelistPatterns: [], // Same as above, but list of regexes
     tailwind: {
-      theme: {
-        extend: {
-          spacing: {
-            72: "18rem",
-            84: "21rem",
-            96: "24rem"
-          }
-        }
-      }, // Extend Tailwind theme
       colors: {
         primary: "#b027b0",
         secondary: "#009688",
@@ -60,22 +47,16 @@ plugins = [
 ```
 
 Then you should add Tailwind utilites CSS in your app component.
-
 ```js
 import "smelte/src/tailwind.css";
 ```
 
 You might also need to include material icons in your template's <head> if you use any:
-
 ```html
-<link
-  href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  rel="stylesheet"
-/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 ```
 
 Or ship them along with Roboto if you would like to use default material font
-
 ```html
 <link
   href="https://fonts.googleapis.com/css?family=Roboto:300,400,500|Material+Icons&display=swap"
@@ -93,7 +74,6 @@ import Treeview from "smelte/src/components/Treeview";
 ```
 
 ### Components
-
 - [x] Text field
 - [x] Button
 - [x] Select
@@ -114,9 +94,14 @@ import Treeview from "smelte/src/components/Treeview";
 - [x] Revise events (on:change, on:focus, on:input...)
 - [x] Treeview
 - [x] Date picker
+- [ ] Form
+- [ ] Stepper
+- [ ] Upload
+- [ ] Rating
+- [ ] Pagination
+- [ ] Breadcrumbs
 
 ### Features
-
 - [x] Default typography per Material design spec
 - [x] Material icons
 - [x] CSS ripple animation
@@ -129,3 +114,4 @@ import Treeview from "smelte/src/components/Treeview";
 - [x] Svelte template (without Sapper)
 - [x] JS ripple animation
 - [x] Dark mode
+- [ ] IE 11 support

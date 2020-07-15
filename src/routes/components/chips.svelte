@@ -9,10 +9,17 @@
 
   let closed = false;
   let clicked = false;
+
+  let chip1 = false;
+  let chip2 = false;
+  let chip3 = false;
+  let chip4 = false;
+  let chip5 = false;
 </script>
 
 <h5 class="mt-6 mb-2">Basic</h5>
 <Chip
+  bind:selected={chip1}
   icon="face"
   selectable
   on:close={() => (closed = true)}
@@ -26,6 +33,7 @@
 
 <h5 class="mt-6 mb-2">Outlined</h5>
 <Chip
+  bind:selected={chip2}
   icon="pan_tool"
   outlined
   removable
@@ -35,6 +43,7 @@
   Cats
 </Chip>
 <Chip
+  bind:selected={chip3}
   icon="print"
   outlined
   removable
@@ -45,6 +54,7 @@
   Dogs
 </Chip>
 <Chip
+  bind:selected={chip4}
   icon="pageview"
   outlined
   removable
@@ -55,6 +65,7 @@
   Plants
 </Chip>
 <Chip
+  bind:selected={chip5}
   icon="pets"
   outlined
   removable

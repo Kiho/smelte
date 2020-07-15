@@ -1,7 +1,10 @@
 <script>
-  import { ClassBuilder } from "../../utils/classes.js";
-
   import ListItem from "./ListItem.svelte";
+  import {
+    writable
+  } from "svelte/store";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
   export let items = [];
   export let value = "";
@@ -13,11 +16,6 @@
   export const item = {};
   export const to = null;
   export const selectedClasses = i => i;
-  export const itemClasses = i => i;
-
-  const classesDefault = "py-2 rounded";
-
-  export let classes = classesDefault;
 
   function id(i) {
     if (i.id !== undefined) return i.id;
@@ -33,21 +31,17 @@
     return i;
   }
 
-  const cb = new ClassBuilder($$props.class);
+  const store = writable(config);
 
-  $: c = cb
-    .flush()
-    .add(classes, true, classesDefault)
-    .add($$props.class)
-    .get();
+  $: smelte = smelter($store, $$props);
 </script>
 
-<ul class={c} class:rounded-t-none={select}>
+<ul class={smelte.root.class} class:rounded-t-none={select}>
   {#each items as item, i}
     {#if item.to !== undefined}
       <slot name="item" {item} {dense} {value}>
         <a tabindex={i + 1} href={item.to}>
-          <ListItem bind:value {...item} id={id(item)} {dense} on:change>
+          <ListItem class={smelte.listItem.class} bind:value {...item} id={id(item)} {dense} on:change>
             {item.text}
           </ListItem>
         </a>
@@ -56,14 +50,14 @@
       <slot name="item" {item} {dense} {value}>
         <ListItem
           bind:value
-          {selectedClasses}
-          {itemClasses}
+          class={smelte.listItem.class}
           {...item}
           tabindex={i + 1}
           id={id(item)}
           selected={value === id(item)}
           {dense}
           on:change
+          on:contextmenu
           on:click>
           {getText(item)}
         </ListItem>

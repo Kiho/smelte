@@ -1,19 +1,13 @@
 <script>
-  import { ClassBuilder } from "../../utils/classes.js";
+  import { writable } from "svelte/store";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
+  const store = writable(config);
 
-
-
-  let classesDefault =
-    "fixed top-0 w-full items-center flex-wrap flex left-0 z-30 p-0 h-16 elevation-3 bg-primary-300 dark:bg-dark-600";
-
-  export let classes = classesDefault;
-
-  const cb = new ClassBuilder(classes, classesDefault);
-
-  $: c = cb.flush().add($$props.class).get();
+  $: smelte = smelter($store, $$props);
 </script>
 
-<header class={c}>
+<header class={smelte.root.class}>
   <slot />
 </header>

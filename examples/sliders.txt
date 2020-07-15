@@ -1,5 +1,6 @@
 <script>
-  import { Slider, Checkbox } from "smelte";
+  import { Slider } from "smelte";
+  import { Checkbox } from "smelte";
 
   let value = 0;
   let value2 = 0;

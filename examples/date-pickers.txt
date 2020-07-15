@@ -1,5 +1,5 @@
 <script>
-  import DatePicker from "smelte/src/components/DatePicker";
+  import { DatePicker } from "smelte";
   let selected;
 </script>
 

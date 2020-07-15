@@ -27,14 +27,14 @@
 <h5 class="pt-6 pb-4">Definite linear progress indicator</h5>
 
 <small class="mb-3">{progress}%</small>
-<ProgressLinear {progress} />
+<ProgressLinear color="gray" {progress} />
 
 <h5 class="pt-6 pb-4">Indefinite circular progress indicator</h5>
-<ProgressCircular />
+<ProgressCircular color="secondary" />
 
 <h5 class="pt-6 pb-4">Definite circular progress indicator</h5>
 
 <small class="mb-3">{progress}%</small>
-<ProgressCircular {progress} />
+<ProgressCircular color="error" {progress} />
 
 <Code code={indicators} />

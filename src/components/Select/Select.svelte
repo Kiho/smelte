@@ -1,13 +1,23 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
-  import { quadOut, quadIn } from "svelte/easing";
+  import {
+    createEventDispatcher,
+    onMount
+  } from "svelte";
+  import {
+    quadOut,
+    quadIn
+  } from "svelte/easing";
   import List from "../List/List.svelte";
   import TextField from "../TextField";
-  import { ClassBuilder } from "../../utils/classes.js";
-  import { hideListAction } from '../../utils/hide-list-action';
+  import {
+    hideListAction
+  } from '../../utils/hide-list-action';
 
-  const optionsClassesDefault = "absolute left-0 bg-white rounded elevation-3 w-full z-20 dark:bg-dark-500";
-  const classesDefault = "cursor-pointer relative pb-4";
+  import {
+    writable
+  } from "svelte/store";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
   const noop = i => i;
 
@@ -15,70 +25,73 @@
   export let value = "";
   export const text = "";
   export let label = "";
-  let selectedLabelProp = undefined;
-  export { selectedLabelProp as selectedLabel };
+  export let selectedLabel = "";
   export let color = "primary";
   export let outlined = false;
   export let placeholder = "";
   export let hint = "";
   export let error = false;
-  export let append = "arrow_drop_down";
+  export let append = "";
   export let dense = false;
   export let persistentHint = false;
   export let autocomplete = false;
   export let noUnderline = false;
   export let showList = false;
-  export let classes = classesDefault;
-  export let optionsClasses = optionsClassesDefault;
 
   export let inputWrapperClasses = noop;
-  export let appendClasses = noop;
-  export let labelClasses = noop;
-  export let inputClasses = noop;
-  export let prependClasses = noop;
   export let listClasses = noop;
   export let selectedClasses = noop;
-  export let itemClasses = noop;
-
   export let add = "";
   export let remove = "";
   export let replace = "";
 
-
-
-
+  let filteredItems = items;
   let itemsProcessed = [];
 
+  const props = {
+    outlined,
+    label,
+    placeholder,
+    hint,
+    error,
+    append,
+    persistentHint,
+    color,
+    add,
+    remove,
+    replace,
+    noUnderline,
+  };
 
   function process(it) {
-    return it.map(i => typeof i !== "object"
-     ? ({ value: i, text: i })
-     : i);
+    return it.map(i => typeof i !== "object" ?
+      ({
+        value: i,
+        text: i
+      }) :
+      i);
   }
 
   $: itemsProcessed = process(items);
 
+  onMount(() => {
+    selectedLabel = getLabel(value);
+  })
+
   const dispatch = createEventDispatcher();
 
-  let selectedLabel = '';
-  $: {
-    if (selectedLabelProp !== undefined) {
-      selectedLabel = selectedLabelProp;
-    } else if (value !== undefined) {
-      let selectedItem = itemsProcessed.find(i => i.value === value);
-      selectedLabel = selectedItem ? selectedItem.text : '';
-    } else {
-      selectedLabel = '';
-    }
+  function getLabel(value) {
+    return value !== undefined ? (itemsProcessed.find(i => i.value === value) || {
+      text: ""
+    }).text : "";
   }
 
-  let filterText = null;
-  $: filteredItems = itemsProcessed.filter(
-    i => !filterText || i.text.toLowerCase().includes(filterText)
-  );
-
-  function filterItems({ target }) {
-    filterText = target.value.toLowerCase();
+  function filterItems({
+    target
+  }) {
+    filteredItems = itemsProcessed.filter(i =>
+      i.text.toLowerCase().includes(target.value.toLowerCase())
+    );
   }
 
   function handleInputClick() {
@@ -91,26 +104,12 @@
 
   const onHideListPanel = () => showList = false;
 
-  const cb = new ClassBuilder(classes, classesDefault);
-  $: c = cb
-    .flush()
-    .add(classes, true, classesDefault)
-    .add($$props.class)
-    .get();
+  const store = writable(config);
 
-  const ocb = new ClassBuilder(optionsClasses, optionsClassesDefault);
-  $: o = ocb
-    .flush()
-    .add(optionsClasses, true, optionsClassesDefault)
-    .add("rounded-t-none", !outlined)
-    .get();
-    
-  $: if (dense) {
-    appendClasses = (i) => i.replace('pt-4', 'pt-3');
-  }  
+  $: smelte = smelter($store, $$props);
 </script>
 
-<div class={c} use:hideListAction={onHideListPanel}>
+<div class={smelte.root.class} use:hideListAction={onHideListPanel}>
   <slot name="select">
     <TextField
       select
@@ -118,48 +117,35 @@
       focused={showList}
       {autocomplete}
       value={selectedLabel}
-      {outlined}
-      {label}
-      {placeholder}
-      {hint}
-      {error}
-      {append}
-      {persistentHint}
-      {color}
-      {add}
-      {remove}
-      {replace}
-      {noUnderline}
+      {...props}
       class={inputWrapperClasses}
-      {appendClasses}
-      {labelClasses}
-      {inputClasses}
-      {prependClasses}
       on:click={handleInputClick}
-      on:click-append={(e => showList = !showList)}
+      on:click-append={(e=> showList = !showList)}
       on:click
       on:input={filterItems}
+      append="arrow_drop_down"
       appendReverse={showList}
-    />
+      />
   </slot>
 
   {#if showList}
     <slot name="options">
       <div
-        class={o}
+        class={smelte.options.class}
         on:click={() => (showList = false)}
       >
         <List
           bind:value
           class={listClasses}
           {selectedClasses}
-          {itemClasses}
           select
           {dense}
           items={filteredItems}
           on:change={({ detail }) => {
+            selectedLabel = getLabel(detail);
             dispatch('change', detail);
-          }} />
+          }}
+        />
       </div>
     </slot>
   {/if}

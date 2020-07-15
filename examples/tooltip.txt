@@ -1,5 +1,6 @@
 <script>
-  import { Tooltip, Button } from "smelte";
+  import { Tooltip } from "smelte";
+  import { Button } from "smelte";
 </script>
 
 <Tooltip>

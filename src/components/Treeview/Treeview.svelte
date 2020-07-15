@@ -1,9 +1,31 @@
 <script>
-  import List, { ListItem } from "../List";
-  import Icon from "../Icon";
+  import List from "../List";
+  import TreeviewItem from "./TreeviewItem.svelte";
+
+  import { writable } from "svelte/store";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
   import { createEventDispatcher } from "svelte";
-  import { slide } from "svelte/transition";
+
+  function defaultToggle(i) {
+    dispatch("select", i);
+
+    if (selectable && !i.items) {
+      selected = i;
+    }
+
+    if (i.items) {
+      dispatch("expand", i);
+    }
+
+    if (controlled) return;
+
+    expanded =
+      i && i.items && !expanded.includes(i)
+        ? [...expanded, i]
+        : expanded.filter(si => si !== i);
+  }
 
   export let items = [];
   export const value = "";
@@ -16,60 +38,51 @@
   export let expandIcon = "arrow_right";
   export let selectable = true;
   export let selected = null;
-  export let selectedClasses = "bg-primary-trans";
-
-  const classesDefault = "rounded";
-
-
-  let expanded = [];
+  export let controlled = false;
+  export let expanded = [];
+  export let toggle = defaultToggle;
+  export let isExpanded = () => {};
+  export let itemProps = () => {};
 
   const dispatch = createEventDispatcher();
 
-  function toggle(i) {
-    dispatch("select", i);
+  const store = writable(config);
 
-    if (selectable && !i.items) {
-      selected = i;
-    }
-
-    expanded = i && !expanded.includes(i)
-      ? [...expanded, i]
-      : expanded.filter(si => si !== i);
-  }
+  $: smelte = smelter($store, $$props);
 </script>
 
-
-<List
-  {items}
-  {...$$props}
->
+<List {items} {...$$props} class={smelte.root.class}>
   <span slot="item" let:item>
-    <ListItem
+    <TreeviewItem
+      class={smelte.listItem.class}
       {item}
-      {...$$props}
-      {...item}
-      selected={selectable && selected === item}
-      {selectedClasses}
-      on:click={() => toggle(item) }
-      on:click
-    >
-      <div class="flex items-center">
-        {#if showExpandIcon && !item.hideArrow && item.items}
-          <Icon tip={expanded.includes(item)}>{expandIcon}</Icon>
-        {/if}
-        <slot><span>{item.text}</span></slot>
-      </div>
-    </ListItem>
-
-    {#if item.items && expanded.includes(item)}
-      <div in:slide class="ml-6">
+      {text}
+      {select}
+      {showExpandIcon}
+      {expandIcon}
+      {selectable}
+      {selected}
+      {toggle}
+      {smelte}
+      on:contextmenu
+      {itemProps}
+      on:click-expand>
+      <slot {item}>{item.text}</slot>
+    </TreeviewItem>
+    {#if (!controlled && item.items && expanded.includes(item)) || (controlled && isExpanded(item))}
+      <div class={smelte.container.class}>
         <svelte:self
           {...$$props}
+          {expanded}
           items={item.items}
           level={level + 1}
           on:click
           on:select
-        />
+          on:expand
+          on:contextmenu
+          let:item>
+          <slot {item}>{item.text}</slot>
+        </svelte:self>
       </div>
     {/if}
   </span>

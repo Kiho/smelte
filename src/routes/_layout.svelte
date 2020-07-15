@@ -2,7 +2,7 @@
   import AppBar from "components/AppBar";
   import Tabs from "components/Tabs";
   import Button from "components/Button";
-  import { Spacer } from "components/Util";
+  import { Spacer, Smelte } from "components/Util";
   import List, { ListItem } from "components/List";
   import NavigationDrawer from "components/NavigationDrawer";
   import ProgressLinear from "components/ProgressLinear";
@@ -13,12 +13,14 @@
   import { navMenu, topMenu } from "../utils/menu.js";
   import { right, elevation, persistent, showNav } from "stores.js";
   import dark from "../dark.js";
+  import dense from "../dense.js";
 
   const { preloading, page } = stores();
 
   let selected = "";
 
   const darkMode = dark();
+  const denseMode = dense();
 
   $: path = $page.path;
 </script>
@@ -47,13 +49,13 @@
   <a href={link.to} class="hidden">{link.text}</a>
 {/each}
 
-<AppBar class={i => i.replace('primary-300', 'dark-600')}>
+<AppBar class="bg-dark-600">
   <a href="." class="px-2 md:px-8 flex items-center">
     <img src="/logo.png" alt="Smelte logo" width="44" />
     <h6 class="pl-3 text-white tracking-widest font-thin text-lg">SMELTE</h6>
   </a>
   <Spacer />
-  <Tabs navigation items={topMenu} bind:selected={path} />
+  <Tabs color="white" navigation items={topMenu} bind:selected={path} />
 
   <Tooltip>
     <span slot="activator">
@@ -61,12 +63,25 @@
         bind:value={$darkMode}
         icon="wb_sunny"
         small
-        flat
+        fab
         remove="p-1 h-4 w-4"
-        iconClass="text-white"
-        text />
+        color="white"
+        elevation={false} />
     </span>
     {$darkMode ? 'Disable' : 'Enable'} dark mode
+  </Tooltip>
+  <Tooltip>
+    <span slot="activator">
+      <Button
+        bind:value={$denseMode}
+        icon="wb_sunny"
+        small
+        fab
+        remove="p-1 h-4 w-4"
+        color="white"
+        elevation={false} />
+    </span>
+    {$darkMode ? 'Disable' : 'Enable'} dense mode
   </Tooltip>
   <div class="md:hidden">
     <Button
@@ -74,7 +89,7 @@
       small
       flat
       remove="p-1 h-4 w-4"
-      iconClass="text-white"
+      color="white"
       text
       on:click={() => showNav.set(!$showNav)} />
   </div>
@@ -82,6 +97,8 @@
     <img src="/github.png" alt="Github Smelte" width="24" height="24" />
   </a>
 </AppBar>
+
+<Smelte />
 
 <main
   class="relative p-8 lg:max-w-3xl mx-auto mb-10 mt-24 md:ml-64 md:pl-16
@@ -92,11 +109,6 @@
     right={$right}
     persistent={$persistent}
     elevation={$elevation}>
-    <h6
-      class="px-3 ml-1 pb-2 pt-8 text-sm text-gray-900 font-light
-      dark:text-gray-100">
-      Components
-    </h6>
     <List items={navMenu}>
       <span slot="item" let:item class="cursor-pointer">
         {#if item.to === '/typography'}

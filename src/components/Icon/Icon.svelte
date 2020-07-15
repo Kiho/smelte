@@ -1,31 +1,27 @@
 <script>
+  import { writable } from "svelte/store";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
+  const store = writable(config);
 
-  export let small = false;
-  export let xs = false;
-  export let reverse = false;
-  export let tip = false;
-  export let color = "default";
+  $: smelte = smelter($store, $$props);
 </script>
 
 <style>
-  .reverse {
+  :global(.reverse) {
     transform: rotate(180deg);
   }
 
-  .tip {
+  :global(.tip) {
     transform: rotate(90deg);
   }
 </style>
 
 <i
   aria-hidden="true"
-  class="material-icons icon text-xl {$$props.class} duration-200 ease-in"
-  class:reverse
-  class:tip
+  class={smelte.root.class}
   on:click
-  class:text-base={small}
-  class:text-xs={xs}
-  style={color ? `color: ${color}` : ''}>
+>
   <slot />
 </i>

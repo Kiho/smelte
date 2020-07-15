@@ -2,6 +2,8 @@
 function ripple(color, centered) {
   return function(event) {
     const target = event.currentTarget;
+    if (target.classList.contains("no-ripple")) return;
+
     const circle = document.createElement("span");
     const d = Math.max(target.clientWidth, target.clientHeight);
 
@@ -37,11 +39,10 @@ function ripple(color, centered) {
 
 export default function r(color = "primary", centered = false) {
   return function(node) {
-    const onMouseDown = ripple(color, centered);
-    node.addEventListener("mousedown", onMouseDown);
+    node.addEventListener("click", ripple(color, centered));
 
     return {
-      onDestroy: () => node.removeEventListener("mousedown", onMouseDown),
+      onDestroy: () => node.removeEventListener("click")
     };
   };
 }

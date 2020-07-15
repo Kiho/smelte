@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import { slide, fade, fly } from "svelte/transition";
   import Card from "../Card/Card.svelte";
   import TextField from "../TextField";
   import Button from "../Button";
@@ -14,7 +15,6 @@
   export let todayClasses = "text-primary-600 rounded-full border border-primary-600";
   export let selectedClasses = "bg-primary-600 text-white rounded-full";
   export let closeOnSelect = true;
-  export let dense;
   export let paginatorProps = {
     color: "gray",
     text: true,
@@ -91,44 +91,42 @@
   }
 </script>
 
-<div>
-  <Card class="absolute z-20 p-4 w-auto dark:bg-dark-400 bg-white {dense ? '-my-4' : ''}">
-    <div class="flex justify-between mb-4">
-      <span class="text-gray-600 uppercase">{year} {month}</span>
-      <div class="flex">
-        <Button
-          icon="keyboard_arrow_left"
-          {...paginatorProps}
-          on:click={prev} />
-        <Button
-          icon="keyboard_arrow_right"
-          {...paginatorProps}
-          on:click={next} />
-      </div>
+<Card class="absolute z-20 p-4 w-auto dark:bg-dark-400 bg-white">
+  <div class="flex justify-between mb-4">
+    <span class="text-gray-600 uppercase">{year} {month}</span>
+    <div class="flex">
+      <Button
+        icon="keyboard_arrow_left"
+        {...paginatorProps}
+        on:click={prev} />
+      <Button
+        icon="keyboard_arrow_right"
+        {...paginatorProps}
+        on:click={next} />
     </div>
+  </div>
 
-    <div class="md:w-64 sm:w-full">
-      <div class="flex uppercase text-gray-400 text-xs text-left">
-        {#each weekdays as weekday}
-          <div class="w-1/7 text-center p-1">
-            {weekday}
-          </div>
-        {/each}
-      </div>
-      <div class="flex flex-wrap text-left text-sm">
-        {#if dayOffset}<div class="p-1 w-{dayOffset}/7" />{/if}
-        {#each daysInMonth as i}
-          <div class="w-1/7 p-1">
-            <div class="w-8 h-8 duration-100 relative {i.isToday && !i.selected ? todayClasses : ""} {i.selected ? selectedClasses : ""}"
-              on:click={() => select(i.day)}
-            >
-              <Ripple color="gray" class="p-1 w-full h-full">
-                {i.day}
-              </Ripple>
-            </div>
-          </div>
-        {/each}
-      </div>
+  <div class="md:w-64 sm:w-full">
+    <div class="flex uppercase text-gray-400 text-xs text-left">
+      {#each weekdays as weekday}
+        <div class="w-1/7 text-center p-1">
+          {weekday}
+        </div>
+      {/each}
     </div>
-  </Card>
-</div>
+    <div class="flex flex-wrap text-left text-sm">
+      {#if dayOffset}<div class="p-1 w-{dayOffset}/7" />{/if}
+      {#each daysInMonth as i}
+        <div class="w-1/7 p-1">
+          <div class="w-8 h-8 duration-100 relative {i.isToday && !i.selected ? todayClasses : ""} {i.selected ? selectedClasses : ""}"
+            on:click={() => select(i.day)}
+          >
+            <Ripple color="gray" class="p-1 w-full h-full">
+              {i.day}
+            </Ripple>
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+</Card>

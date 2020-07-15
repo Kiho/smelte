@@ -1,6 +1,6 @@
 <script context="module">
   import { writable } from "svelte/store";
-
+  
   const queue = writable([]);
   let running = false;
 </script>
@@ -12,7 +12,8 @@
   import { quadOut, quadIn } from "svelte/easing";
   import Button from "../Button";
   import { Spacer } from "../Util";
-  import utils, { ClassBuilder } from "../../utils/classes.js";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
   export let value = false;
   export let timeout = 2000;
@@ -29,25 +30,8 @@
 
   const dispatch = createEventDispatcher();
 
-  const classesDefault = `pointer-events-auto flex absolute py-2 px-4 z-30 mb-4 content-between mx-auto
-      rounded items-center elevation-2 h-12`;
-  const wrapperDefault = "fixed w-full h-full flex items-center justify-center pointer-events-none";
-
-  export let classes = wrapperDefault;
-
-  const cb = new ClassBuilder($$props.class, classesDefault);
-  const wrapperCb = new ClassBuilder(classes, wrapperDefault);
-
-  let wClasses = i => i;
   let tm;
   let node;
-
-  let bg = () => {};
-
-  $: {
-    const u = utils(color || "gray");
-    bg = u.bg;
-  }
 
   $: {
     hash = hash || (value ? btoa(`${value}${new Date().valueOf()}`) : null);
@@ -84,23 +68,21 @@
     }, timeout);
   }
 
-  $: c = cb
-      .flush()
-      .add(bg(800), color)
-      .add("right-0 mr-2", right)
-      .add("top-0 mt-2", top)
-      .add("left-0 ml-2", left)
-      .add("bottom-0", bottom)
-      .add("snackbar", !noAction)
-      .get();
+  const store = writable(config);
+
+  $: smelte = smelter($store, {
+      $$props,
+      top,
+      bottom,
+      right,
+      left,
+      noAction,
+      text,
+      color
+  });
 
   // for some reason it doesn't get updated otherwise
-  $: if (node) node.classList = c;
-
-  wClasses = wrapperCb
-    .flush()
-    .add(`text-${text}`)
-    .get();
+  $: if (node) node.classList = smelte.snackbar.class;
 </script>
 
 <style>
@@ -111,15 +93,15 @@
 
 {#if value && (running === hash)}
   <div
-    class="fixed w-full h-full top-0 left-0 z-30 pointer-events-none"
+    class={smelte.container.class}
   >
-    <div class={wClasses}>
+    <div class={smelte.wrapper.class}>
       <div
         bind:this={node}
         in:scale={inProps}
         out:fade={outProps}
         on:click={() => value = false}>
-        <slot />
+        <slot /> 
         {#if !noAction}
           <Spacer />
           <slot name="action">

@@ -1,59 +1,50 @@
+<script context="module">
+  import { writable } from 'svelte/store';
+
+  const showId = writable(false);
+  const uid = () => [...Array(64)].map(() => (Math.random() * 16 | 0).toString(16)).join('');
+</script>
+
 <script>
   import { scale, fade } from "svelte/transition";
-  import { ClassBuilder } from "../../utils/classes.js";
-
-  const classesDefault = "tooltip whitespace-no-wrap text-xs absolute mt-2 bg-gray-600 text-gray-50 rounded md:px-2 md:py-2 py-4 px-3 z-30";
-
-  export let classes = classesDefault;
-
+  import debounce from "../../utils/debounce.js";
+  import config from "./config";
+  import smelter from "../../utils/smelter";
 
   export let show = false;
 
   export let timeout = null;
-  export let delayHide = 100;
-  export let delayShow = 100;
+  export let inDelay = 0;
+  export let outDelay = 1000;
 
-  const cb = new ClassBuilder(classes, classesDefault);
-  $: c = cb
-    .flush()
-    .add(classes, true, classesDefault)
-    .add($$props.class)
-    .get();
+  let id = uid();
+  let tm;
+
+  $: if (show) $showId = id;
 
   function showTooltip() {
-    if (show) return;
-
+    $showId = id;
     show = true;
-
     if (!timeout) return;
 
-    timeout = setTimeout(() => {
+    tm = setTimeout(() => {
       show = false;
+      $showId = false;
     }, timeout);
   }
 
   function hideTooltip() {
-    if (!show) return;
+    if ($showId === id) {
+      $showId = false;
+      show = false;
+    }
 
-    show = false;
-    clearTimeout(timeout);
+    if (timeout) clearTimeout(tm);
   }
 
-  function debounce(func, wait, immediate) {
-    let timeout;
-    return function() {
-      let context = this,
-        args = arguments;
-      let later = function() {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      let callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    };
-  }
+  const store = writable(config);
+
+  $: smelte = smelter($store, $$props);
 </script>
 
 <style>
@@ -63,10 +54,10 @@
 }
 </style>
 
-<div class="relative inline-block">
+<div class={smelte.wrapper.class}>
   <div
-    on:mouseenter={debounce(showTooltip, delayShow)}
-    on:mouseleave={debounce(hideTooltip, delayHide)}
+    on:mouseenter={debounce(showTooltip, 30)}
+    on:mouseleave={debounce(hideTooltip, 200)}
     on:mouseenter
     on:mouseleave
     on:mouseover
@@ -75,11 +66,11 @@
     <slot name="activator" />
   </div>
 
-  {#if show}
+  {#if $showId === id}
     <div
-      in:scale={{ duration: 150 }}
-      out:scale={{ duration: 150, delay: 100 }}
-      class={c}
+      in:scale={{ duration: 30, delay: inDelay }}
+      out:fade={{ duration: 75, delay: outDelay }}
+      class={smelte.root.class}
     >
       <slot />
     </div>
